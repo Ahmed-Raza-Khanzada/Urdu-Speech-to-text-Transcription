@@ -11,7 +11,7 @@ class Preporcess_Data():
         self.char_to_num  = char_to_num
         self.wavs_path = wavs_path
         self.predict = predict
-    def encode_single_sample(self,wav_file, label):
+    def encode_single_sample(self,wav_file, label=None):
         ###########################################
         ##  Process the Audio
         ##########################################

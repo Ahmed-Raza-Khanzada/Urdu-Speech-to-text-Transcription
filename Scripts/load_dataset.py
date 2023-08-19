@@ -4,7 +4,7 @@ import pandas as pd
 import pickle
 
 class Load_Data():
-    def __init__(self,data_path="./",out_path="./"):
+    def __init__(self,data_path="./",out_path="./",predict=False):
         self.out_path = out_path
         self.data_path=data_path#if path not  changed then /content/drive/MyDrive/Urdu_Speech_wavs/
         self.wavs_path = self.data_path + "/Dataset/cv-corpus-14.0-2023-06-23/ur/limited_wav_files/"
@@ -39,15 +39,16 @@ class Load_Data():
             # with open(self.vocab_path_out, "wb") as f:
             #     pickle.dump(self.char_to_num.get_vocabulary(), f)
             self.num_to_char =  keras.layers.StringLookup(vocabulary=self.char_to_num.get_vocabulary(), oov_token="", invert=True)
-        print(
-            f"The loaded vocabulary is: {self.num_to_char.get_vocabulary()} "
-            f"(size ={self.num_to_char.vocabulary_size()})"
-        )
-        print(
-            f"The loaded vocabulary is: {self.char_to_num.get_vocabulary()} "
-            f"(size ={self.char_to_num.vocabulary_size()})")
-        self.__clean_dataset__()
-        self.__train_test_split__()
+        if not predict:
+            print(
+                f"The loaded vocabulary is: {self.num_to_char.get_vocabulary()} "
+                f"(size ={self.num_to_char.vocabulary_size()})"
+            )
+            print(
+                f"The loaded vocabulary is: {self.char_to_num.get_vocabulary()} "
+                f"(size ={self.char_to_num.vocabulary_size()})")
+            self.__clean_dataset__()
+            self.__train_test_split__()
     def __clean_dataset__(self):
         # Rename columns using the .rename() method
         self.metadata_df =self.metadata_df.rename(columns=self.new_column_names)

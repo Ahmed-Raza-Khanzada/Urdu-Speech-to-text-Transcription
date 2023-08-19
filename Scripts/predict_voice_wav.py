@@ -8,7 +8,7 @@ from utils import decode_batch_predictions,CTCLoss
 
 model_checkpoint_path = "./models/model_checkpoint.h5"
 
-load_data = Load_Data()
+load_data = Load_Data(predict=True)
 char_to_num= load_data.char_to_num
 num_to_char  = load_data.num_to_char
 wavs_path =load_data.wavs_path
@@ -53,7 +53,7 @@ while True:
     predictions = []
     #reshape spectograms (1,spectograms.shape[0],spectograms.shape[1])
     spectograms=tf.expand_dims(spectograms, axis=0)
-    print(spectograms.shape,"@@@@@@@@@@@@@")
+    print("Spectogram shape: ",spectograms.shape)
     # spectograms = tf.expand_dims(spectograms, axis=0)
     batch_predictions1 = model.predict(spectograms)
     # print(batch_predictions1[:2])

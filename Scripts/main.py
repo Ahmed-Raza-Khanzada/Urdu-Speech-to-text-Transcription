@@ -13,6 +13,7 @@ model_checkpoint_path = "./models/model_checkpoint.h5"
 # model_weights_path = "./models/model_weights.h5"
 # Define the number of epochs.
 epochs = 10
+batch_size = 32
 
 
 
@@ -26,7 +27,6 @@ wavs_path =load_data.wavs_path
 
 prepro_data = Preporcess_Data(wavs_path,char_to_num)
 fft_length = prepro_data.fft_length
-batch_size = 32
 # Define the training dataset
 train_dataset = tf.data.Dataset.from_tensor_slices(
     (list(df_train["file_name"]), list(df_train["normalized_transcription"]))
