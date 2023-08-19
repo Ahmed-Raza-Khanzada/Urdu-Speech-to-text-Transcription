@@ -1,21 +1,23 @@
 
 class CallbackEval(keras.callbacks.Callback):
 
-    def __init__(self, dataset):
+    def __init__(self, dataset,num_to_char,model):
         super().__init__()
         self.dataset = dataset
+        self.num_to_char = num_to_char
+        self.model = model
 
     def on_epoch_end(self, epoch: int, logs=None):
         predictions = []
         targets = []
         for batch in self.dataset:
             X, y = batch
-            batch_predictions = model.predict(X)
-            batch_predictions = decode_batch_predictions(batch_predictions)
+            batch_predictions = self.model.predict(X)
+            batch_predictions = decode_batch_predictions(batch_predictions,self.num_to_char)
             predictions.extend(batch_predictions)
             for label in y:
                 label = (
-                    tf.strings.reduce_join(num_to_char(label)).numpy().decode("utf-8")
+                    tf.strings.reduce_join(self.num_to_char(label)).numpy().decode("utf-8")
                 )
                 targets.append(label)
         wer_score = wer(targets, predictions)
@@ -44,7 +46,7 @@ def CTCLoss(y_true, y_pred):
 
 
 # A utility function to decode the output of the network
-def decode_batch_predictions(pred):
+def decode_batch_predictions(pred,num_to_char):
     input_len = np.ones(pred.shape[0]) * pred.shape[1]
     # Use greedy search. For complex tasks, you can use beam search
     results = keras.backend.ctc_decode(pred, input_length=input_len, greedy=True)[0][0]
