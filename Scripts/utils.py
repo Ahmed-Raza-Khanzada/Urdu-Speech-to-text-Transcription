@@ -1,12 +1,15 @@
 
+from tensorflow import keras
+import numpy as np
+import tensorflow as tf
 class CallbackEval(keras.callbacks.Callback):
 
-    def __init__(self, dataset,num_to_char,model):
+    def __init__(self, dataset,num_to_char,model,wer):
         super().__init__()
         self.dataset = dataset
         self.num_to_char = num_to_char
         self.model = model
-
+        self.wer = wer
     def on_epoch_end(self, epoch: int, logs=None):
         predictions = []
         targets = []
@@ -20,7 +23,7 @@ class CallbackEval(keras.callbacks.Callback):
                     tf.strings.reduce_join(self.num_to_char(label)).numpy().decode("utf-8")
                 )
                 targets.append(label)
-        wer_score = wer(targets, predictions)
+        wer_score = self.wer(targets, predictions)
         print("-" * 100)
         print(f"Word Error Rate: {wer_score:.4f}")
         print("-" * 100)

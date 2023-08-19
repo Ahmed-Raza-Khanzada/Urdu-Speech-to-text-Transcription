@@ -29,7 +29,7 @@ metadata_path = data_path + "Dataset/cv-corpus-14.0-2023-06-23/ur/final_main_dat
 #     pickle.dump(char_to_num.get_vocabulary(), f)
 
 # Loading the vocabulary back from pickle
-vocab_path_inp = "vocab_path.p"
+vocab_path_inp = "vocab_path.pkl"
 loaded_vocab = None
 with open(vocab_path_inp, "rb") as f:
     loaded_vocab = pickle.load(f)

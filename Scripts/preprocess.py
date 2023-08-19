@@ -1,5 +1,6 @@
-class Preporcess_Data()
-    def __init__(self,wavs_path,char_to_num,frame_length = 256,frame_step  =160,fft_length = 384) -> None:
+import tensorflow as tf
+class Preporcess_Data():
+    def __init__(self,wavs_path,char_to_num,frame_length = 256,frame_step  =160,fft_length = 384,predict = False) -> None:
         # An integer scalar Tensor. The window length in samples.
         self.frame_length = frame_length#600#256
         # An integer scalar Tensor. The number of samples to step.
@@ -9,7 +10,8 @@ class Preporcess_Data()
         self.fft_length = fft_length#650#384
         self.char_to_num  = char_to_num
         self.wavs_path = wavs_path
-    def encode_single_sample(wav_file, label,predict = False):
+        self.predict = predict
+    def encode_single_sample(self,wav_file, label):
         ###########################################
         ##  Process the Audio
         ##########################################
@@ -36,7 +38,7 @@ class Preporcess_Data()
         ##  Process the label
         ##########################################
         # 7. Convert label to Lower case
-        if not predict:
+        if not self.predict:
             label = tf.strings.lower(label)
             # 8. Split the label
             label = tf.strings.unicode_split(label, input_encoding="UTF-8")
