@@ -81,12 +81,12 @@ def encode_single_sample(wav_file, label=None):
         ##########################################
         # 1. Read wav
 
-        # file = tf.io.read_file(wavs_path + wav_file+".wav")
+        file = tf.io.read_file( wav_file)
         # 2. Decode the wav file
-        # audio, _ = tf.audio.decode_wav(wav_file)
-        # audio = tf.squeeze(audio, axis=-1)
+        audio, _ = tf.audio.decode_wav(file)
+        audio = tf.squeeze(audio, axis=-1)
         # 3. Change type to float
-        audio = tf.cast(wav_file, tf.float32)
+        audio = tf.cast(audio, tf.float32)
         # 4. Get the spectrogram
         spectrogram = tf.signal.stft(
             audio, frame_length=frame_length, frame_step=frame_step, fft_length=fft_length
@@ -114,26 +114,20 @@ def encode_single_sample(wav_file, label=None):
 # Function to perform transcription in a separate thread
 def transcribe_frames(frames):
     with frames_lock:
-        audio_data_np = np.frombuffer(b''.join(frames), np.int16).flatten().astype("float32") / 32768.0
-        # audio_tensor = torch.from_numpy(audio_data_np)
-        audio_tensor = tf.convert_to_tensor(audio_data_np, dtype=tf.float32)
-        # Preprocess audio_tensor using your Preporcess_Data class
-        # prepro_data = Preporcess_Data(wavs_path="path_to_wavs_folder", char_to_num=None)
-        print(audio_tensor.shape,"***********************")
-        spectrogram = encode_single_sample(audio_tensor)
+        # audio_data_np = np.frombuffer(b''.join(frames), np.int16).flatten().astype("float32") / 32768.0
+        # audio_tensor = tf.convert_to_tensor(audio_data_np, dtype=tf.float32)
+        
+        spectrogram = encode_single_sample("audio.wav")
 
-         # Let's check results on more validation samples
-        predictions = []
-        #reshape spectograms (1,spectograms.shape[0],spectograms.shape[1])
-        spectograms=tf.expand_dims(spectrogram, axis=0)
-        print("Spectogram shape: ",spectograms.shape)
-        # spectograms = tf.expand_dims(spectograms, axis=0)
+        # Let's check results on more validation samples
+    
+
+        spectograms = tf.expand_dims(spectrogram, axis=0)
         batch_predictions1 = model.predict(spectograms)
-        # print(batch_predictions1[:2])
         batch_predictions = decode_batch_predictions(batch_predictions1)
-        print(batch_predictions,len(batch_predictions))
-        socketio.emit('audio_dt', f' {predictions} ')
-threshold = 63305.0
+        print(batch_predictions, len(batch_predictions))
+        socketio.emit('audio_dt', f' {batch_predictions} ')
+        frames.clear()
 # threshold = 1499305.0
 ms = 500
 silence_duration = 0
@@ -143,7 +137,25 @@ def check_thresh(a):
     audio_buffer = np.frombuffer(a, dtype=np.int16)
     b = ((np.abs(np.fft.rfft(audio_buffer))) * 16000 / (len(a)//2)).mean()
     return b > threshold 
-
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+CHUNK = 4096*10
+audio1 = pyaudio.PyAudio()
+RATE = 46000
+threshold = 63305.0
+def save_wav(frames, filename, chunk = CHUNK  ,sample_format =FORMAT, channels = CHANNELS, fs = RATE):
+    wf = wave.open(filename, 'wb')
+    wf.setnchannels(channels)
+    try:
+        wf.setsampwidth(audio1.get_sample_size(sample_format))
+    except Exception as e:
+        print(str(e))
+        pass
+    wf.setframerate(fs)
+    time.sleep(0.1)
+    wf.writeframes(b''.join(frames))
+#     frames.clear()
+    wf.close()
 # Define SocketIO event handler for audio data
 @socketio.on('audio_data', namespace='/')
 def handle_audio_data(audio_data):
@@ -171,7 +183,7 @@ def handle_audio_data(audio_data):
     if silence_duration * 1000 >= ms and start:
         if len(frames_in)>=10:
             print("YEEEEEEEEEEEs")
-
+            save_wav(frames_in, 'audio.wav')
              # Start a new thread for transcription
             transcription_thread = threading.Thread(target=transcribe_frames, args=(frames_in.copy(),))
             transcription_thread.start()
