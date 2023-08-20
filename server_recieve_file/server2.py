@@ -25,8 +25,8 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 frames_lock = threading.Lock()
 data_path = "../"
 out_path = "../"
-vocab_path_inp ="G:\FYP\Dataset\char_to_num_vocab_v2.pkl"
-vocab_path_out = "G:\FYP\Dataset\char_to_num_vocab_v2.pkl"
+vocab_path_inp =data_path + "/Dataset/char_to_num_vocab_v2.pkl"
+vocab_path_out =out_path + "/Dataset/char_to_num_vocab_v2.pkl"
 model_checkpoint_path = r"G:\FYP\models\model_checkpoint_v2.h5"
 loaded_vocab = None
 if os.path.exists(vocab_path_inp):
@@ -37,7 +37,8 @@ if os.path.exists(vocab_path_inp):
 # Creating the integer to character mapping using the loaded vocabulary
 char_to_num = keras.layers.StringLookup(vocabulary=loaded_vocab, oov_token="")
 num_to_char = keras.layers.StringLookup(vocabulary=loaded_vocab, oov_token="", invert=True)
-print("LOADED VOCAB",loaded_vocab)
+
+
 
 def CTCLoss(y_true, y_pred):
     # Compute the training-time loss value
@@ -127,12 +128,6 @@ def transcribe_frames(frames):
         print(batch_predictions, len(batch_predictions))
         socketio.emit('audio_dt', f' {batch_predictions} ')
         frames.clear()
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-CHUNK = 4096*10
-audio1 = pyaudio.PyAudio()
-RATE = 16000
-threshold = 63305.0
 # threshold = 1499305.0
 ms = 500
 silence_duration = 0
@@ -142,6 +137,12 @@ def check_thresh(a):
     audio_buffer = np.frombuffer(a, dtype=np.int16)
     b = ((np.abs(np.fft.rfft(audio_buffer))) * 16000 / (len(a)//2)).mean()
     return b > threshold 
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+CHUNK = 4096*10
+audio1 = pyaudio.PyAudio()
+RATE = 32000
+threshold = 63305.0
 def save_wav(frames, filename, chunk = CHUNK  ,sample_format =FORMAT, channels = CHANNELS, fs = RATE):
     wf = wave.open(filename, 'wb')
     wf.setnchannels(channels)
