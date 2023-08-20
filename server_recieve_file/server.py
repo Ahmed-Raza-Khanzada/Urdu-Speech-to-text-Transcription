@@ -127,6 +127,7 @@ def transcribe_frames(frames):
         print(batch_predictions, len(batch_predictions))
         socketio.emit('audio_dt', f' {batch_predictions} ')
         frames.clear()
+        
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 CHUNK = 4096*10

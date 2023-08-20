@@ -141,7 +141,7 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 CHUNK = 4096*10
 audio1 = pyaudio.PyAudio()
-RATE = 32000
+RATE =16000
 threshold = 63305.0
 def save_wav(frames, filename, chunk = CHUNK  ,sample_format =FORMAT, channels = CHANNELS, fs = RATE):
     wf = wave.open(filename, 'wb')

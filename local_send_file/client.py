@@ -40,8 +40,8 @@ def main():
     # Open the default input stream
     stream = p.open(format=pyaudio.paInt16,
                     channels=1,
-                    # rate=44100,
                     rate=16000,
+                    # rate=16000,
                     input=True,
                     frames_per_buffer=1024,
                     stream_callback=audio_callback)

@@ -58,7 +58,8 @@ while True:
     batch_predictions1 = model.predict(spectograms)
     # print(batch_predictions1[:2])
     batch_predictions = decode_batch_predictions(batch_predictions1,num_to_char)
-    print(batch_predictions,len(batch_predictions))
+    print(batch_predictions[0][::-1])
+    print(batch_predictions[0])
     predictions.extend(batch_predictions)
 
 #common_voice_ur_26562732,common_voice_ur_26562733
