@@ -6,9 +6,9 @@ from load_dataset import Load_Data
 from preprocess import Preporcess_Data
 from utils import decode_batch_predictions,CTCLoss
 
-model_checkpoint_path = "./models/model_checkpoint.h5"
+model_checkpoint_path = "./models/model_checkpoint_v2.h5"
 
-load_data = Load_Data(predict=True)
+load_data = Load_Data(data_path="./",out_path="./",predict=True)
 char_to_num= load_data.char_to_num
 num_to_char  = load_data.num_to_char
 wavs_path =load_data.wavs_path
@@ -61,8 +61,4 @@ while True:
     print(batch_predictions,len(batch_predictions))
     predictions.extend(batch_predictions)
 
-
-
-
-
-
+#common_voice_ur_26562732,common_voice_ur_26562733
