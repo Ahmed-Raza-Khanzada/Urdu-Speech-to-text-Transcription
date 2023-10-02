@@ -4,3 +4,4 @@ ffmpeg.exe
 ffprobe.exe
 # audio.wav
 __pycache__
+node_modules

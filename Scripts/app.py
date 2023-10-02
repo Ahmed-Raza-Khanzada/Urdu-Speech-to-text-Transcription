@@ -14,6 +14,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+app.static_folder = '../static'
+
 UPLOAD_FOLDER = '../uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -60,49 +62,55 @@ else:
 #     # validation_dataset = tf.data.Dataset.from_tensor_slices(
 #     # wav_file )
 
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
+
+
 @app.route('/transcribe', methods=['POST'])
 def transcribe():
     """
     ARGs:
-        employee_id       (int)
-        company_id        (int)
-        image             (file)
+        audio_file       (file): The audio file to transcribe.
     Returns:
     """
     # Check if the 'audio_file' field exists in the request
-    if 'audio_file' not in request.files:
-        return jsonify({'error': 'No audio file provided'}), 400
+    try:
+        if 'audio_file' not in request.files:
+            return jsonify({'error': 'No audio file provided'}), 400
 
-    # Get the uploaded audio file
-    wav_file = request.files['audio_file']
+        # Get the uploaded audio file
+        wav_file = request.files['audio_file']
 
-    # Check if the file is empty
-    if wav_file.filename == '':
-        return jsonify({'error': 'Empty audio file'}), 400
+        # Check if the file is empty
+        if wav_file.filename == '':
+            return jsonify({'error': 'Empty audio file'}), 400
 
-    # Generate a safe filename for the uploaded file
-    filename = secure_filename(wav_file.filename)
+        # Generate a safe filename for the uploaded file
+        filename = secure_filename(wav_file.filename)
 
-    # Save the uploaded file to the temporary directory
-    wav_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        # Save the uploaded file to the temporary directory
+        wav_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-    spectograms = prepro_data.encode_single_sample(filename)
+        spectograms = prepro_data.encode_single_sample(filename)
 
-    # Let's check results on more validation samples
-    predictions = []
-    #reshape spectograms (1,spectograms.shape[0],spectograms.shape[1])
-    spectograms=tf.expand_dims(spectograms, axis=0)
-    print("Spectogram shape: ",spectograms.shape)
-    # spectograms = tf.expand_dims(spectograms, axis=0)
-    batch_predictions1 = model.predict(spectograms)
-    # print(batch_predictions1[:2])
-    batch_predictions = decode_batch_predictions(batch_predictions1,num_to_char)
-    print(batch_predictions[0][::-1])
-    print(batch_predictions[0])
-    predictions.extend(batch_predictions)
+        # Let's check results on more validation samples
+        predictions = []
+        #reshape spectograms (1,spectograms.shape[0],spectograms.shape[1])
+        spectograms=tf.expand_dims(spectograms, axis=0)
+        print("Spectogram shape: ",spectograms.shape)
+        # spectograms = tf.expand_dims(spectograms, axis=0)
+        batch_predictions1 = model.predict(spectograms)
+        # print(batch_predictions1[:2])
+        batch_predictions = decode_batch_predictions(batch_predictions1,num_to_char)
+        print(batch_predictions[0][::-1])
+        print(batch_predictions[0])
+        predictions.extend(batch_predictions)
 
-    return jsonify({'predictions': batch_predictions[0][::-1]}), 200
-
+        return jsonify({'successfull':True,
+                        'predictions': batch_predictions[0][::-1]}), 200
+    except Exception as e:
+        return jsonify({'error': str(e), 'successfull':False}), 400
 #common_voice_ur_26562732,common_voice_ur_26562733
 
 
