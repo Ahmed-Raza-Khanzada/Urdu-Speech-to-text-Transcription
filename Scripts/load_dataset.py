@@ -7,7 +7,8 @@ class Load_Data():
     def __init__(self,data_path="./",out_path="./",predict=False):
         self.out_path = out_path
         self.data_path=data_path#if path not  changed then /content/drive/MyDrive/Urdu_Speech_wavs/
-        self.wavs_path = self.data_path + "/Dataset/cv-corpus-14.0-2023-06-23/ur/limited_wav_files/"
+        # self.wavs_path = self.data_path + "/Dataset/cv-corpus-14.0-2023-06-23/ur/limited_wav_files/"
+        self.wavs_path = self.data_path + "/uploads/"
         self.metadata_path = self.data_path + "/Dataset/cv-corpus-14.0-2023-06-23/ur/final_main_dataset.tsv"
         self.vocab_path_inp = self.data_path + "/Dataset/char_to_num_vocab_v2.pkl"
         self.vocab_path_out = self.out_path + "/Dataset/char_to_num_vocab_v2.pkl"

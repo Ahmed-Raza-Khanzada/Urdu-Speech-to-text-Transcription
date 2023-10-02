@@ -1,5 +1,6 @@
-/Dataset
-/models
+# *.tsv
+/models/*.h5
 ffmpeg.exe
 ffprobe.exe
-audio.wav
+# audio.wav
+__pycache__
