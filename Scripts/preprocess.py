@@ -16,8 +16,10 @@ class Preporcess_Data():
         ##  Process the Audio
         ##########################################
         # 1. Read wav
-
-        file = tf.io.read_file(self.wavs_path + wav_file+".wav")
+        # import pdb
+        # pdb.set_trace()
+        # file = tf.io.read_file(self.wavs_path + wav_file+".wav")
+        file = tf.io.read_file(self.wavs_path + wav_file)
         # 2. Decode the wav file
         audio, _ = tf.audio.decode_wav(file)
         audio = tf.squeeze(audio, axis=-1)
