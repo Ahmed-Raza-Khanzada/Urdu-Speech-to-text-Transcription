@@ -55,12 +55,10 @@ def CTCLoss(y_true, y_pred):
 
 # A utility function to decode the output of the network
 def decode_batch_predictions(pred):
+    # Using CTC decoding instead of greedy decoding for better results
     input_len = np.ones(pred.shape[0]) * pred.shape[1]
-    # Use greedy search. For complex tasks, you can use beam search
-    results = keras.backend.ctc_decode(pred, input_length=input_len, greedy=True)[0][0]
-    # Iterate over the results and get back the text
+    results = keras.backend.ctc_decode(pred, input_length=input_len, greedy=False, beam_width=10, top_paths=1)[0][0]
     output_text = []
-    print(results,"*"*50)
     for result in results:
         result = tf.strings.reduce_join(num_to_char(result)).numpy().decode("utf-8")
         output_text.append(result)
@@ -132,9 +130,11 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 CHUNK = 4096*10
 audio1 = pyaudio.PyAudio()
-RATE = 16000
-threshold = 63305.0
-# threshold = 1499305.0
+# RATE = 16000
+RATE = 15000
+# threshold = 63305.0
+# threshold = 10305.0
+threshold = 1499305.0
 ms = 500
 silence_duration = 0
 last_speech_time = time.time()
@@ -152,7 +152,7 @@ def save_wav(frames, filename, chunk = CHUNK  ,sample_format =FORMAT, channels =
         print(str(e))
         pass
     wf.setframerate(fs)
-    time.sleep(0.1)
+    # time.sleep(0.1)
     wf.writeframes(b''.join(frames))
 #     frames.clear()
     wf.close()
@@ -177,11 +177,11 @@ def handle_audio_data(audio_data):
             # User is silent
             silence_duration = time.time() - last_speech_time
             if start:
-                frames_in.append(audio_data)
+                frames_in.append(audio_data )
     # print(type(frames_in[0]),len(frames_in[0]),np.array(frames_in).shape,"****************")
     # print("\n",silence_duration,start,"???????????????????????")
     if silence_duration * 1000 >= ms and start:
-        if len(frames_in)>=10:
+        if len(frames_in)>=30:#10
             print("YEEEEEEEEEEEs")
             save_wav(frames_in, 'audio.wav')
              # Start a new thread for transcription
